@@ -22,12 +22,17 @@ MESSAGES = {
 
 
 class DomainIssue(Exception):
-    def __init__(self, code: str, status: int = 400, detail: str | None = None):
+    def __init__(self, code: str, status: int = 400, detail: str | None = None, extra: dict | None = None):
         self.code = code
         self.status = status
         self.detail = detail
+        self.extra = extra or {}
         super().__init__(code)
 
 
 def error_response(exc: DomainIssue):
-    return jsonify(error=exc.detail or MESSAGES.get(exc.code, "请求无法处理"), code=exc.code), exc.status
+    body = {"error": exc.detail or MESSAGES.get(exc.code, "请求无法处理"), "code": exc.code}
+    if getattr(exc, "extra", None):
+        for key, value in exc.extra.items():
+            body.setdefault(key, value)
+    return jsonify(body), exc.status

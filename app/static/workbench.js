@@ -1,5 +1,9 @@
 (function () {
   var state = { payload: null, kind: 'bars', run: null, approved: false };
+  window.workbench = { state: state };
+  function emitRun() {
+    try { window.dispatchEvent(new CustomEvent('wb:run', { detail: state.run })); } catch (e) {}
+  }
   var $ = function (id) { return document.getElementById(id); };
   function esc(value) {
     return String(value === null || value === undefined ? '' : value).replace(/[&<>"']/g, function (ch) {
@@ -91,6 +95,7 @@
       $('run').disabled = true;
       var run = await request('/api/runs', {method: 'POST', body: JSON.stringify({profile: $('profile').value})});
       state.run = run;
+      emitRun();
       state.approved = run.status === 'APPROVED';
       render(run);
       $('run-status').textContent = run.status + ' · rev ' + run.revision;

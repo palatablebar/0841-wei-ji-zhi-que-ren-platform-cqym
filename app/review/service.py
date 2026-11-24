@@ -33,3 +33,22 @@ def serialize(row):
     payload.update(run_id=row["id"], status=row["status"], revision=row["revision"],
                    comment=row["comment"], created_at=row["created_at"])
     return payload
+
+
+# --- 危急值闭环用例再导出，兼容 from app.review.service import handover 等 ---
+try:  # noqa: E402
+    from app.notify.service import (  # noqa: E402,F401
+        acknowledge,
+        create_notification,
+        escalate,
+        get_notification,
+        handover,
+        list_notifications,
+        notify,
+        notify_critical_values,
+        notify_one,
+        record_receipt,
+        serialize_notification,
+    )
+except Exception:  # pragma: no cover
+    pass

@@ -4,12 +4,15 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+from app.notify.store import NotifyStoreMixin
 
-class Store:
+
+class Store(NotifyStoreMixin):
     def __init__(self, path):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.init()
+        self.init_notify()
 
     def connect(self):
         connection = sqlite3.connect(self.path, timeout=8)

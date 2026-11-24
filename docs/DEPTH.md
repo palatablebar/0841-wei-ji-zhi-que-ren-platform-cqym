@@ -15,6 +15,7 @@
 | M5 运行对账 | 核对来源行、采信、隔离、重复与计算条目 | `POST /api/stages/reconcile` | `app/reconcile/ledger.py` | `tests/test_reconcile.py` |
 | M6 批次复核 | 带版本号签发或暂缓，拒绝陈旧复核 | `POST /api/runs/{id}/review` | `app/review/service.py` | `tests/test_review.py` |
 | M7 证据交付 | 仅在签发后输出可校验的复核证据 | `GET /api/runs/{id}/evidence` | `app/evidence/render.py` | `tests/test_evidence.py` |
+| M8 危急值通知闭环 | 每条危急值登记通知/读回回执闭环/幂等重通知/交班换责与逾期升级 | `POST /api/runs/{id}/notifications`、`POST /api/notifications/{key}/receipt`、`POST /api/handover` | `app/notify/service.py`、`app/notify/store.py`、`app/notify/policy.py`、`app/notify/http.py` | `tests/test_notify.py` |
 
 ## 输入陷阱
 

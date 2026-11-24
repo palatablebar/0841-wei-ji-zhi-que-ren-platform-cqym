@@ -1,3 +1,5 @@
+import json
+
 from flask import Blueprint, abort, jsonify, request, send_file
 
 from app.catalog import SPEC
@@ -43,7 +45,33 @@ def create():
     data = request.get_json(silent=True) or {}
     profile = data.get("profile", "dirty")
     payload = pipeline(profile)
-    return jsonify(create_run(store(), payload))
+    run = create_run(store(), payload)
+    # 危急值判定后即为每条危急值建档（无医师/时间时为草稿，首次显式通知补全）。
+    try:
+        from app.notify.service import notify_critical_values
+        full = store().get(run["run_id"])
+        stored_payload = json.loads(full["payload"]) if full else payload
+        stored_payload["run_id"] = run["run_id"]
+        notify_critical_values(store(), stored_payload, data, auto=True)
+        run = serialize(store().get(run["run_id"]))
+        _attach_notifications(run, run["run_id"])
+    except Exception:
+        pass
+    return jsonify(run)
+
+
+def _attach_notifications(run, run_id):
+    from app.notify.service import list_notifications
+    try:
+        items = list_notifications(store(), {"run_id": run_id})
+    except Exception:
+        items = []
+    run["notifications"] = items
+    run["tasks"] = items
+    run["critical_notifications"] = items
+    run["notification_count"] = len(items)
+    run["pending_receipt_count"] = sum(1 for n in items if not n["closed"])
+    return run
 
 
 @api.get("/api/runs/<run_id>")
@@ -51,6 +79,7 @@ def get_run(run_id):
     run = serialize(store().get(run_id))
     if not run:
         raise DomainIssue("RUN_NOT_FOUND", 404)
+    _attach_notifications(run, run_id)
     return jsonify(run)
 
 

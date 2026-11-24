@@ -39,6 +39,46 @@
         </div>
       </div>
     </article>
+    <article class="panel panel-notify" id="panel-notify">
+      <div class="panel-head">
+        <h2>危急值通知闭环</h2>
+        <span class="hint" id="notify-count">尚未建立通知</span>
+      </div>
+      <p class="notify-tip">判定为危急值后逐条登记通知；临床回执并填写<strong>读回内容</strong>才算闭环，仅“已通知”不闭环。重跑或重复通知不会新增待回执任务，也不会清除已有回执与升级。</p>
+      <div class="notify-bar">
+        <label>接收医师
+          <input id="notify-doctor" type="text" placeholder="如：王医师" value="王医师">
+        </label>
+        <label>回执期限(分钟)
+          <input id="notify-sla" type="number" min="0" step="1" value="30">
+        </label>
+        <button id="notify-create" type="button">为每条危急值建通知</button>
+        <button id="notify-refresh" type="button" class="ghost">刷新</button>
+        <span class="notify-sep"></span>
+        <label>交班给当班医师
+          <input id="handover-doctor" type="text" placeholder="如：李医师">
+        </label>
+        <label>交班时间(可选)
+          <input id="handover-at" type="datetime-local" step="1">
+        </label>
+        <button id="handover-all" type="button">交班：未回执换人，逾期补升级</button>
+      </div>
+      <p class="notice" id="notify-notice" role="status"></p>
+      <div class="table-wrap">
+        <table class="notify-table">
+          <thead>
+            <tr>
+              <th>危急值</th><th>接收医师</th><th>当前责任人</th>
+              <th>首次通知时间</th><th>回执期限</th><th>状态</th>
+              <th>临床回执 / 读回内容</th><th>升级与交班</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="notify-body">
+            <tr><td class="empty" colspan="9">执行批次后点击“为每条危急值建通知”</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
   </section>
 </main>
 {% endblock %}
